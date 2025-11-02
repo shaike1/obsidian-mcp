@@ -123,12 +123,16 @@ fi
 
 print_header "Installing MCP Obsidian Package"
 
-if command -v npm &> /dev/null; then
-    log_info "Installing @mcp-server-obsidian globally..."
-    npm install -g @mcp-server-obsidian 2>&1 | grep -E "added|up to date" || true
+# Try pip first (for mcp-obsidian Python package)
+if command -v pip3 &> /dev/null || command -v pip &> /dev/null; then
+    log_info "Installing mcp-obsidian via pip..."
+    pip install -q mcp-obsidian 2>&1 || pip3 install -q mcp-obsidian 2>&1 || true
     log_info "MCP Obsidian package installed"
+elif command -v uvx &> /dev/null; then
+    log_info "uvx is available, using it to run mcp-obsidian"
+    log_info "Skipping install - uvx will handle package management"
 else
-    log_error "npm is not installed. Please install Node.js and npm first."
+    log_error "Neither pip nor uvx is installed. Please install Python or uv first."
     exit 1
 fi
 
